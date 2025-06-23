@@ -1,3 +1,4 @@
+#Исходный код
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import subprocess
@@ -17,35 +18,31 @@ class GModLauncher:
         self.custom_servers = []
         self.server_history = []
         
-        # Инициализация путей
         self.steam_path: Optional[str] = None
         self.gmod_path: Optional[str] = None
         self.update_paths()
         
-        # Загрузка сохраненных данных
         self.load_data()
-        
-        # Локализация
+
         self.setup_localization()
         
-        # Загрузка изображений
         self.load_images()
         
-        # Настройка интерфейса
+
         self.setup_ui()
         self.load_servers()
         self.load_mods()
         
-        # Применяем тему
+
         self.apply_theme()
         self.update_language()
         
-        # Обработчик закрытия окна
+
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
         self.gmod_process = None
     
     def setup_localization(self):
-        """Настройка локализации"""
+        
         self.localization = {
             "ru": {
                 "title": "Garry's Mod Launcher",
@@ -132,7 +129,7 @@ class GModLauncher:
         }
     
     def load_data(self):
-        """Загрузка сохраненных данных"""
+
         try:
             if os.path.exists("launcher_data.json"):
                 with open("launcher_data.json", "r", encoding="utf-8") as f:
@@ -144,7 +141,7 @@ class GModLauncher:
             print(f"Ошибка загрузки данных: {e}")
     
     def save_data(self):
-        """Сохранение данных"""
+        
         try:
             data = {
                 "favorites": self.favorite_servers,
@@ -157,15 +154,15 @@ class GModLauncher:
             print(f"Ошибка сохранения данных: {e}")
     
     def load_images(self):
-        """Загрузка локальных изображений"""
+
         try:
-            # Основной логотип (150x150)
+ 
             self.icon_image = ImageTk.PhotoImage(Image.open("gmo.png").resize((150, 150), Image.LANCZOS))
             
-            # Маленький логотип для заголовка (50x50)
+
             self.small_icon = ImageTk.PhotoImage(Image.open("gmo.png").resize((50, 50), Image.LANCZOS))
             
-            # Фоновое изображение
+
             bg_img = Image.open("gar3main.png")
             self.bg_image = ImageTk.PhotoImage(bg_img.resize((1000, 700), Image.LANCZOS))
             self.bg_image_dark = ImageTk.PhotoImage(bg_img.resize((1000, 700), Image.LANCZOS).point(lambda p: p * 0.4))
@@ -182,23 +179,23 @@ class GModLauncher:
         self.root.geometry("1000x700")
         self.root.minsize(800, 600)
         
-        # Устанавливаем иконку окна
+
         if self.small_icon:
             self.root.iconphoto(False, self.small_icon)
         
-        # Главный контейнер
+
         self.main_frame = ttk.Frame(self.root)
         self.main_frame.pack(fill=tk.BOTH, expand=True)
         
-        # Установка фона
+
         self.bg_label = ttk.Label(self.main_frame)
         self.bg_label.place(x=0, y=0, relwidth=1, relheight=1)
         
-        # Контент поверх фона
+
         self.content_frame = ttk.Frame(self.main_frame)
         self.content_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
         
-        # Заголовок с логотипом
+
         self.header_frame = ttk.Frame(self.content_frame)
         self.header_frame.pack(fill=tk.X, pady=(0, 20))
         
@@ -213,7 +210,7 @@ class GModLauncher:
         self.subtitle_label = ttk.Label(title_frame, font=('Helvetica', 10))
         self.subtitle_label.pack(anchor=tk.W)
         
-        # Кнопки управления
+
         control_frame = ttk.Frame(self.header_frame)
         control_frame.pack(side=tk.RIGHT)
         
@@ -225,24 +222,23 @@ class GModLauncher:
                                   command=self.toggle_language)
         self.lang_btn.pack(side=tk.LEFT)
         
-        # Основное содержимое
+
         self.body_frame = ttk.Frame(self.content_frame)
         self.body_frame.pack(fill=tk.BOTH, expand=True)
         
-        # Создаем вкладки
         self.notebook = ttk.Notebook(self.body_frame)
         self.notebook.pack(fill=tk.BOTH, expand=True)
         
-        # Вкладки
+
         self.setup_servers_tab()
         self.setup_mods_tab()
         self.setup_settings_tab()
         
-        # Панель кнопок внизу
+
         self.bottom_frame = ttk.Frame(self.content_frame)
         self.bottom_frame.pack(fill=tk.X, pady=(20, 0))
         
-        # Зеленая кнопка запуска (полностью зеленая)
+
         self.launch_btn = tk.Button(self.bottom_frame, 
                                   bg="#4CAF50", fg="black",
                                   relief=tk.RAISED, bd=2,
@@ -258,31 +254,31 @@ class GModLauncher:
         self.exit_btn.pack(side=tk.RIGHT, padx=5)
 
     def _(self, key):
-        """Получение локализованного текста"""
+
         return self.localization[self.language].get(key, key)
 
     def update_language(self):
-        """Обновление всех текстов при смене языка"""
+
         self.root.title(self._("title"))
         self.title_label.config(text=self._("title"))
         self.subtitle_label.config(text=self._("subtitle"))
         
-        # Обновление вкладок
+
         for i, tab_name in enumerate(self._("tabs")):
             self.notebook.tab(i, text=tab_name)
         
-        # Обновление кнопок
+
         self.launch_btn.config(text=self._("buttons")["launch"])
         self.refresh_btn.config(text=self._("buttons")["refresh"])
         self.exit_btn.config(text=self._("buttons")["exit"])
         self.lang_btn.config(text="RU/EN" if self.language == "ru" else "EN/RU")
         
-        # Обновление серверов
+
         if hasattr(self, 'servers_tree'):
             for i, col in enumerate(self._("server_columns")):
                 self.servers_tree.heading(f"#{i+1}", text=col)
         
-        # Обновление других элементов
+
         if hasattr(self, 'connect_btn'):
             self.connect_btn.config(text=self._("buttons")["connect"])
         if hasattr(self, 'mods_folder_btn'):
@@ -297,21 +293,21 @@ class GModLauncher:
             self.workshop_btn.config(text=self._("buttons")["workshop"])
 
     def toggle_language(self):
-        """Переключение языка"""
+
         self.language = "en" if self.language == "ru" else "ru"
         self.update_language()
 
     def apply_theme(self):
-        """Применение текущей темы"""
+
         if self.dark_mode:
-            # Темная тема
+
             bg_color = '#2d2d2d'
             fg_color = '#ffffff'
             btn_color = '#3d3d3d'
             self.bg_label.config(image=self.bg_image_dark if self.bg_image_dark else self.bg_image)
             self.theme_btn.config(text=self._("buttons")["theme_dark"])
+
             
-            # Стили для темной темы
             self.style = ttk.Style()
             self.style.configure('.', background=bg_color, foreground='black')
             self.style.configure('TFrame', background=bg_color)
@@ -322,17 +318,17 @@ class GModLauncher:
             self.style.map('Treeview', background=[('selected', '#0078d7')], 
                           foreground=[('selected', 'white')])
             
-            # Зеленая кнопка (остается зеленой в темной теме)
+
             self.launch_btn.config(bg="#4CAF50", fg="black")
         else:
-            # Светлая тема
+
             bg_color = '#f0f0f0'
             fg_color = '#000000'
             btn_color = '#e1e1e1'
             self.bg_label.config(image=self.bg_image)
             self.theme_btn.config(text=self._("buttons")["theme_light"])
             
-            # Стили для светлой темы
+
             self.style = ttk.Style()
             self.style.configure('.', background=bg_color, foreground='black')
             self.style.configure('TFrame', background=bg_color)
@@ -343,16 +339,16 @@ class GModLauncher:
             self.style.map('Treeview', background=[('selected', '#0078d7')], 
                           foreground=[('selected', 'white')])
             
-            # Зеленая кнопка
+
             self.launch_btn.config(bg="#4CAF50", fg="black")
 
     def toggle_theme(self):
-        """Переключение темы"""
+"
         self.dark_mode = not self.dark_mode
         self.apply_theme()
 
     def refresh_all(self):
-        """Обновление всех данных"""
+
         self.update_paths()
         self.load_servers()
         self.load_mods()
@@ -365,7 +361,7 @@ class GModLauncher:
         self.gmod_path = self.find_gmod_path()
     
     def find_steam_path(self) -> Optional[str]:
-        """Поиск пути к Steam через реестр Windows"""
+
         try:
             with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\Valve\\Steam") as key:
                 path = winreg.QueryValueEx(key, "InstallPath")[0]
@@ -374,7 +370,7 @@ class GModLauncher:
         except Exception as e:
             print(f"Не удалось найти Steam в реестре: {e}")
         
-        # Альтернативные пути поиска
+
         alternate_paths = [
             os.path.join(os.getenv("ProgramFiles(x86)", ""), "Steam"),
             os.path.expanduser("~") + "\\Steam",
@@ -393,12 +389,12 @@ class GModLauncher:
         if not self.steam_path:
             return None
             
-        # Стандартный путь
+
         standard_path = os.path.join(self.steam_path, "steamapps", "common", "GarrysMod", "gmod.exe")
         if os.path.exists(standard_path):
             return standard_path
             
-        # Поиск через библиотеки Steam
+
         library_folders_path = os.path.join(self.steam_path, "steamapps", "libraryfolders.vdf")
         if os.path.exists(library_folders_path):
             try:
@@ -419,27 +415,26 @@ class GModLauncher:
         self.servers_tab = ttk.Frame(self.notebook)
         self.notebook.add(self.servers_tab, text=self._("tabs")[0])
         
-        # Таблица серверов
+
         self.servers_tree = ttk.Treeview(self.servers_tab, columns=("name", "players", "map", "ping", "address"), show="headings")
         for i, col in enumerate(self._("server_columns")):
             self.servers_tree.heading(f"#{i+1}", text=col)
         
-        # Настройка столбцов
+
         self.servers_tree.column("name", width=250, anchor=tk.W)
         self.servers_tree.column("players", width=70, anchor=tk.CENTER)
         self.servers_tree.column("map", width=120, anchor=tk.W)
         self.servers_tree.column("ping", width=50, anchor=tk.CENTER)
         self.servers_tree.column("address", width=120, anchor=tk.W)
-        
-        # Полоса прокрутки
+
         scrollbar = ttk.Scrollbar(self.servers_tab, orient="vertical", command=self.servers_tree.yview)
         self.servers_tree.configure(yscrollcommand=scrollbar.set)
         
-        # Размещение
+
         self.servers_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         
-        # Кнопки управления серверами
+
         btn_frame = ttk.Frame(self.servers_tab)
         btn_frame.pack(fill=tk.X, padx=5, pady=5)
         
@@ -453,22 +448,21 @@ class GModLauncher:
         self.favorite_btn.pack(side=tk.LEFT, padx=5)
     
     def setup_mods_tab(self):
-        """Настройка вкладки с модами"""
+        
         self.mods_tab = ttk.Frame(self.notebook)
         self.notebook.add(self.mods_tab, text=self._("tabs")[1])
-        
-        # Список модов
+
         self.mods_list = tk.Listbox(self.mods_tab, selectmode=tk.MULTIPLE)
         
-        # Полоса прокрутки
+
         scrollbar = ttk.Scrollbar(self.mods_tab, orient="vertical", command=self.mods_list.yview)
         self.mods_list.configure(yscrollcommand=scrollbar.set)
         
-        # Размещение
+
         self.mods_list.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         
-        # Кнопки управления модами
+
         btn_frame = ttk.Frame(self.mods_tab)
         btn_frame.pack(fill=tk.X, padx=5, pady=5)
         
@@ -486,7 +480,7 @@ class GModLauncher:
         self.settings_tab = ttk.Frame(self.notebook)
         self.notebook.add(self.settings_tab, text=self._("tabs")[2])
         
-        # Настройки путей
+
         path_frame = ttk.LabelFrame(self.settings_tab, text=self._("settings")["paths"], padding=10)
         path_frame.pack(fill=tk.X, padx=10, pady=5)
         
@@ -501,7 +495,7 @@ class GModLauncher:
         ttk.Button(btn_frame, text=self._("buttons")["manual_select"], 
                   command=self.manual_path_select).pack(side=tk.LEFT, padx=5)
         
-        # Параметры запуска
+
         launch_frame = ttk.LabelFrame(self.settings_tab, text=self._("settings")["launch_options"], padding=10)
         launch_frame.pack(fill=tk.X, padx=10, pady=5)
         
@@ -515,7 +509,7 @@ class GModLauncher:
                        variable=self.console_var).pack(anchor=tk.W)
 
     def add_custom_server(self):
-        """Добавление пользовательского сервера"""
+
         ip = simpledialog.askstring(self._("settings")["enter_ip"], 
                                    self._("settings")["enter_ip"])
         if not ip:
@@ -538,7 +532,7 @@ class GModLauncher:
                           self._("settings")["server_added"])
 
     def toggle_favorite(self):
-        """Добавление/удаление сервера из избранного"""
+
         selected = self.servers_tree.focus()
         if not selected:
             messagebox.showwarning(self._("settings")["error"], 
@@ -546,22 +540,22 @@ class GModLauncher:
             return
             
         server = self.servers_tree.item(selected)['values']
-        address = server[4]  # Адрес сервера
+        address = server[4]  
         
-        # Проверяем, есть ли сервер в избранном
+
         if any(s[4] == address for s in self.favorite_servers):
-            # Удаляем из избранного
+
             self.favorite_servers = [s for s in self.favorite_servers if s[4] != address]
             self.favorite_btn.config(text=self._("buttons")["add_favorite"])
         else:
-            # Добавляем в избранное
+
             self.favorite_servers.append(server)
             self.favorite_btn.config(text=self._("buttons")["remove_favorite"])
         
         self.save_data()
 
     def install_workshop_mod(self):
-        """Установка мода из мастерской Steam"""
+ 
         if not self.steam_path:
             messagebox.showerror(self._("settings")["error"], 
                                self._("settings")["no_steam"])
@@ -573,11 +567,10 @@ class GModLauncher:
             return
             
         try:
-            # Формируем команду для установки мода
+
             steamcmd = os.path.join(self.steam_path, "steamcmd.exe")
             command = f'"{steamcmd}" +login anonymous +workshop_download_item 4000 {mod_id} +quit'
             
-            # Запускаем установку
             subprocess.Popen(command, shell=True)
             messagebox.showinfo(self._("settings")["success"], 
                               self._("settings")["mod_installed"])
@@ -586,7 +579,7 @@ class GModLauncher:
                                f"Ошибка установки мода: {e}")
 
     def open_workshop(self):
-        """Открытие мастерской Steam"""
+
         webbrowser.open("https://steamcommunity.com/workshop/browse/?appid=4000")
 
     def manual_path_select(self):
@@ -634,19 +627,18 @@ class GModLauncher:
             ("Zombie Survival | Выживание", "18/24", "zs_lighthouse", "42", "zombie.example.com:27015")
         ]
         
-        # Добавляем избранные серверы
+
         for server in self.favorite_servers:
             self.servers_tree.insert("", tk.END, values=server, tags=('favorite',))
         
-        # Добавляем обычные серверы
+
         for server in servers:
             self.servers_tree.insert("", tk.END, values=server)
-        
-        # Добавляем пользовательские серверы
+    
+
         for server in self.custom_servers:
             self.servers_tree.insert("", tk.END, values=server, tags=('custom',))
-        
-        # Настраиваем теги для цветового выделения
+
         self.servers_tree.tag_configure('favorite', background='#fffacd')  # Светло-желтый для избранных
         self.servers_tree.tag_configure('custom', background='#e6f7ff')    # Светло-голубой для пользовательских
 
@@ -684,25 +676,25 @@ class GModLauncher:
             return
             
         try:
-            # Базовые параметры запуска
+
             args = [self.gmod_path]
             
-            # Добавляем дополнительные параметры
+
             options = self.launch_options.get().strip()
             if options:
                 args.extend(options.split())
             
-            # Добавляем консоль, если нужно
+
             if self.console_var.get():
                 args.append("-console")
             
-            # Скрываем окно лаунчера
+
             self.root.withdraw()
             
-            # Запускаем игру
+ 
             self.gmod_process = subprocess.Popen(args)
             
-            # Проверяем завершение процесса
+
             self.root.after(1000, self.check_gmod_process)
                 
         except Exception as e:
@@ -711,7 +703,7 @@ class GModLauncher:
                                f"Не удалось запустить игру:\n{e}")
 
     def check_gmod_process(self):
-        """Проверка состояния процесса GMod"""
+
         if self.gmod_process.poll() is None:
             # Процесс еще работает, проверяем снова через секунду
             self.root.after(1000, self.check_gmod_process)
@@ -721,7 +713,7 @@ class GModLauncher:
             self.gmod_process = None
 
     def connect_to_server(self):
-        """Подключение к выбранному серверу"""
+
         selected = self.servers_tree.focus()
         if not selected:
             messagebox.showwarning(self._("settings")["error"], 
@@ -729,9 +721,9 @@ class GModLauncher:
             return
         
         server_info = self.servers_tree.item(selected)['values']
-        address = server_info[4]  # Адрес сервера
+        address = server_info[4]  
         
-        # Добавляем сервер в историю
+
         if server_info not in self.server_history:
             self.server_history.append(server_info)
             self.save_data()
@@ -742,21 +734,21 @@ class GModLauncher:
             return
             
         try:
-            # Формируем команду для подключения
+
             args = [self.gmod_path, "-connect", address]
             
-            # Добавляем дополнительные параметры
+
             options = self.launch_options.get().strip()
             if options:
                 args.extend(options.split())
             
-            # Скрываем окно лаунчера
+
             self.root.withdraw()
             
-            # Запускаем игру с подключением к серверу
+
             self.gmod_process = subprocess.Popen(args)
             
-            # Проверяем завершение процесса
+а
             self.root.after(1000, self.check_gmod_process)
                 
         except Exception as e:
