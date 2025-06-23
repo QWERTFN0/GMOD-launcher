@@ -1,4 +1,4 @@
-#Исходный код
+#The source code
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import subprocess
