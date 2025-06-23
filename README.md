@@ -5,3 +5,5 @@ HOW TO INSTALL?
 1.Download the ZIP 
 2. Unpack everything into any folder
 3. Launch, configure the launch parameters and play
+
+The browser may block the file, you will need to allow this file, if you are afraid that there are viruses there, just check the source code: https://github.com/QWERTFN0/GMOD-launcher/blob/main/launcher.py
